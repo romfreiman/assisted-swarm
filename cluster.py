@@ -39,7 +39,6 @@ class ClusterConfig:
     started_all_agents: Event
 
 
-
 class Cluster(RetryingStateMachine, WithContainerConfigs):
     def __init__(self, cluster_config: ClusterConfig, swarm_agent_config: SwarmAgentConfig):
         super().__init__(
@@ -94,13 +93,29 @@ class Cluster(RetryingStateMachine, WithContainerConfigs):
 
         self.logging = logging
 
-    @property
-    def agent_ips(self):
-        return [f"10.123.{i >> 8}.{i & 0xff}/16" for i in range(1, self.total_agents + 1)]
+    def agent_directory(self, agent_index):
+        return self.cluster_dir / f"agent-{agent_index}"
+
+    def agent_ip(self, agent_index):
+        ip_index = agent_index + 1
+        return f"10.123.{ip_index >> 8}.{ip_index & 0xff}/16"
+
+    def hostname(self, agent_index):
+        return f"{self.identifier}-{agent_index}"
+
+    def dry_reboot_marker(self, agent_index):
+        return self.agent_directory(agent_index) / "fake_reboot_marker"
 
     @property
-    def hostnames(self):
-        return [f"{self.identifier}-{agent_index}" for agent_index in range(self.total_agents)]
+    def cluster_hosts(self):
+        return [
+            {
+                "hostname": self.hostname(agent_index),
+                "ip": self.agent_ip(agent_index),
+                "rebootMarkerPath": self.dry_reboot_marker(agent_index),
+            }
+            for agent_index in range(self.total_agents)
+        ]
 
     @property
     def total_agents(self):
@@ -194,13 +209,12 @@ class Cluster(RetryingStateMachine, WithContainerConfigs):
                 ClusterAgentConfig(
                     index=agent_index,
                     mac_address=self.make_mac(self.cluster_config.index, agent_index),
-                    machine_ip=self.agent_ips[agent_index],
-                    machine_hostname=self.hostnames[agent_index],
+                    machine_ip=self.agent_ip(agent_index),
+                    machine_hostname=self.hostname(agent_index),
                     cluster_identifier=self.identifier,
                     cluster_dir=self.cluster_dir,
                     identifier=f"{self.identifier}-{agent_index}",
-                    cluster_hostnames=self.hostnames,
-                    cluster_ips=self.agent_ips,
+                    cluster_hosts=self.cluster_hosts,
                 ),
             )
             for agent_index in range(self.total_agents)
