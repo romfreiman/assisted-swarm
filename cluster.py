@@ -3,6 +3,7 @@ import base64
 import jinja2
 import logging
 import subprocess
+import json
 from pathlib import Path
 from collections import OrderedDict
 
@@ -250,8 +251,7 @@ class Cluster(RetryingStateMachine, WithContainerConfigs):
             "SKIP_CERT_VERIFICATION": "true",
             "HIGH_AVAILABILITY_MODE": "false",
             "CHECK_CLUSTER_VERSION": "true",
-            "DRY_HOSTNAMES": ",".join(self.hostnames),
-            "DRY_MCS_ACCESS_IPS": ",".join(ip.split("/")[0] for ip in self.agent_ips),
+            "DRY_CLUSTER_HOSTS": json.dumps(self.cluster_hosts),
         }
 
         controller_mounts = {str(self.cluster_config.storage_dir): str(self.cluster_config.storage_dir)}
