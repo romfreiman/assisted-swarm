@@ -112,7 +112,7 @@ class Cluster(RetryingStateMachine, WithContainerConfigs):
             {
                 "hostname": self.hostname(agent_index),
                 "ip": self.agent_ip(agent_index),
-                "rebootMarkerPath": self.dry_reboot_marker(agent_index),
+                "rebootMarkerPath": str(self.dry_reboot_marker(agent_index)),
             }
             for agent_index in range(self.total_agents)
         ]
