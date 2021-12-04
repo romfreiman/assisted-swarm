@@ -215,6 +215,8 @@ class Cluster(RetryingStateMachine, WithContainerConfigs):
                     cluster_dir=self.cluster_dir,
                     identifier=f"{self.identifier}-{agent_index}",
                     cluster_hosts=self.cluster_hosts,
+                    agent_dir=self.agent_directory(agent_index),
+                    fake_reboot_marker_path=self.dry_reboot_marker(agent_index),
                 ),
             )
             for agent_index in range(self.total_agents)
