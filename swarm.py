@@ -62,7 +62,6 @@ class Swarm(RetryingStateMachine):
                     "Checking root": self.check_root,
                     "Ensuring swarm directory exists": self.ensure_swarm_directory_exists,
                     "Validating system podman lock config": self.validate_system_podman_lock_config,
-                    "Ensuring global swarm directory automount": self.ensure_swarm_directory_automount,
                     "Killing previous swarm": self.kill_previous_swarm,
                     "Deleting previous swarm storage": self.delete_previous_swarm_storage,
                     "Creating service account": self.create_serviceaccount,
@@ -85,27 +84,6 @@ class Swarm(RetryingStateMachine):
             logging=self.logging,
             name=f"Swarm",
         )
-
-    def ensure_swarm_directory_automount(self, next_state):
-        self.logging.info(f"Ensuring global swarm directory automount")
-
-        automount = f"{str(global_swarm_directory)}:{str(global_swarm_directory)}"
-
-        try:
-            with open("/etc/containers/mounts.conf", "r") as mounts_conf:
-                mounts = mounts_conf.readlines()
-        except FileNotFoundError:
-            mounts = []
-
-        if any(mount.strip() == automount for mount in mounts):
-            self.logging.info(f"Global swarm directory automount already exists")
-        else:
-            mounts.append(automount)
-
-        with open("/etc/containers/mounts.conf", "w") as mounts_conf:
-            mounts_conf.write("\n".join(mounts))
-
-        return next_state
 
     def copy_fake_coreos_installer(self, next_state):
         self.executor.check_call(["sudo", "cp", str(script_dir / "dry-installer"), "/usr/local/bin/"])

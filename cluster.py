@@ -105,7 +105,7 @@ class Cluster(RetryingStateMachine, WithContainerConfigs):
         return f"{self.identifier}-{agent_index}"
 
     def dry_reboot_marker(self, agent_index):
-        return self.agent_directory(agent_index) / "fake_reboot_marker"
+        return Path("/var/log") / f"{self.identifier}-{agent_index}-cluster_fake_reboot_marker"
 
     @property
     def cluster_hosts(self):
