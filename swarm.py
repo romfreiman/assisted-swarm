@@ -91,8 +91,11 @@ class Swarm(RetryingStateMachine):
 
         automount = f"{str(global_swarm_directory)}:{str(global_swarm_directory)}"
 
-        with open("/etc/containers/mounts.conf", "r") as mounts_conf:
-            mounts = mounts_conf.readlines()
+        try:
+            with open("/etc/containers/mounts.conf", "r") as mounts_conf:
+                mounts = mounts_conf.readlines()
+        except FileNotFoundError:
+            mounts = []
 
         if any(mount.strip() == automount for mount in mounts):
             self.logging.info(f"Global swarm directory automount already exists")
