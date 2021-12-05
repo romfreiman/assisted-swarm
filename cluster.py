@@ -251,7 +251,7 @@ class Cluster(RetryingStateMachine, WithContainerConfigs):
             "SKIP_CERT_VERIFICATION": "true",
             "HIGH_AVAILABILITY_MODE": "false",
             "CHECK_CLUSTER_VERSION": "true",
-            "DRY_CLUSTER_HOSTS": json.dumps(self.cluster_hosts),
+            "DRY_CLUSTER_HOSTS": json.dumps(self.cluster_hosts, separators=(',', ':')),
         }
 
         controller_mounts = {str(self.cluster_config.storage_dir): str(self.cluster_config.storage_dir)}

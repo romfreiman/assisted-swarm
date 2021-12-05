@@ -249,7 +249,7 @@ class Agent(RetryingStateMachine, WithContainerConfigs):
             "DRY_FAKE_REBOOT_MARKER_PATH": str(self.fake_reboot_marker_path),
             "DRY_FORCED_HOSTNAME": self.cluster_agent_config.machine_hostname,
             # The installer needs to know all the hostnames in the cluster
-            "DRY_CLUSTER_HOSTS": json.dumps(self.cluster_agent_config.cluster_hosts),
+            "DRY_CLUSTER_HOSTS": json.dumps(self.cluster_agent_config.cluster_hosts, separators=(',', ':')),
             "DRY_FORCED_HOST_IPV4": self.cluster_agent_config.machine_ip,
         }
 
