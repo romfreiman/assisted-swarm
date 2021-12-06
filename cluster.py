@@ -254,7 +254,7 @@ class Cluster(RetryingStateMachine, WithContainerConfigs):
             "DRY_CLUSTER_HOSTS": json.dumps(self.cluster_hosts, separators=(',', ':')),
         }
 
-        controller_mounts = {str(self.cluster_config.storage_dir): str(self.cluster_config.storage_dir)}
+        controller_mounts = {str(fake_reboot_marker_path.parent): str(fake_reboot_marker_path.parent)}
 
         podman_command = [
             "podman",
