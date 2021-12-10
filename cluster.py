@@ -261,6 +261,7 @@ class Cluster(RetryingStateMachine, WithContainerConfigs):
             "run",
             "--net=host",
             "--pid=host",
+            "--privileged",
             "-it",
             *(f"-e={var}={value}" for var, value in controller_environment.items()),
             *(f"-v={host_path}:{container_path}" for host_path, container_path in controller_mounts.items()),
